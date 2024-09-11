@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: sample
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  schemaspy:
+    image: schemaspy/schemaspy:latest
+    depends_on:
+      - db
+    command: [
+      "-t", "pgsql",
+      "-db", "sample",
+      "-s", "public",
+      "-host", "db",
+      "-port", "5432",
+      "-u", "user",
+      "-p", "password",
+      "-o", "/output"
+    ]
+    volumes:
+      - ./docs:/output
